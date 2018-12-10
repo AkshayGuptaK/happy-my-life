@@ -1,0 +1,23 @@
+{
+  "name": "happy-my-life",
+  "version": "1.0.0",
+  "description": "A web client for a deckbuilding card game with both solo and multiplayer modes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkshayGuptaK/happy-my-life.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AkshayGuptaK/happy-my-life/issues"
+  },
+  "homepage": "https://github.com/AkshayGuptaK/happy-my-life#readme",
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
