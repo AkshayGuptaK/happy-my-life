@@ -5,9 +5,9 @@ import Card from './Card'
 class CardStack extends React.Component {
   render () {
     return (
-      <div>
+      <div className='cardStack'>
         {this.props.count > 0
-          ? <Card />
+          ? <Card {...this.props} />
           : null
         }
       </div>

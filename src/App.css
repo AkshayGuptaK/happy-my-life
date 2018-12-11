@@ -1,0 +1,22 @@
+.card {
+  border: 2px solid black;
+  border-radius: 5%;
+  max-width: 200px;
+}
+
+.cardStack {
+  display: inline-block;
+}
+
+[texture='banana'] {
+  background: url('../public/assets/textures/banana.png') no-repeat local;
+}
+[texture='water'] {
+  background: url('../public/assets/textures/waterbottle.png') no-repeat local;
+}
+[texture='raincheck'] {
+  background: url('../public/assets/textures/raincheck.png') no-repeat local;
+}
+[texture='sad'] {
+  background: url('../public/assets/textures/sadmemory.png') no-repeat local;
+}

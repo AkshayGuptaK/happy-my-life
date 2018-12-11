@@ -3,6 +3,7 @@ import { hot } from 'react-hot-loader'
 // import { Route, Redirect, Switch } from 'react-router-dom'
 
 import '../App.css'
+import DraftArray from './DraftArray'
 
 class App extends React.Component {
   constructor (props) {
@@ -11,7 +12,10 @@ class App extends React.Component {
   }
   render () {
     return (
-      <p>A deckbuilding game of mundane proportions</p>
+      <div>
+        <p>A deckbuilding game of mundane proportions</p>
+        <DraftArray players={1} />
+      </div>
     )
   }
 }
