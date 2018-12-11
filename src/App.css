@@ -1,7 +1,14 @@
-.card {
+.card, .cardBack {
   border: 2px solid black;
   border-radius: 5%;
   max-width: 200px;
+  display: inline-block;
+}
+
+.cardBack {
+  background: url('../public/assets/back.png') no-repeat local;
+  min-width: 100px;
+  min-height: 200px;
 }
 
 .cardStack {
@@ -19,4 +26,25 @@
 }
 [texture='sad'] {
   background: url('../public/assets/textures/sadmemory.png') no-repeat local;
+}
+
+.hand {
+  border: 5px solid black;
+  border-radius: 5%;
+  width: 60%;
+  display: inline-block;
+}
+
+.deck {
+  border: 5px solid black;
+  border-radius: 5%;
+  width: 15%;
+  display: inline-block;
+}
+
+.discard {
+  border: 5px solid black;
+  border-radius: 5%;
+  width: 15%;
+  display: inline-block;
 }
