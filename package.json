@@ -4,7 +4,9 @@
   "description": "A web client for a deckbuilding card game with both solo and multiplayer modes",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server --mode development",
+    "prod": "webpack --mode production"
   },
   "repository": {
     "type": "git",
