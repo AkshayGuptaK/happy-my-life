@@ -2,7 +2,7 @@
   "name": "happy-my-life",
   "version": "1.0.0",
   "description": "A web client for a deckbuilding card game with both solo and multiplayer modes",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --mode development",
@@ -38,6 +38,7 @@
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-hot-loader": "^4.3.12",
-    "react-router-dom": "^4.3.1"
+    "react-router-dom": "^4.3.1",
+    "shortid": "^2.2.14"
   }
 }

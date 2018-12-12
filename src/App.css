@@ -27,24 +27,27 @@
 [texture='sad'] {
   background: url('../public/assets/textures/sadmemory.png') no-repeat local;
 }
+[texture='reward'] {
+  background: url('../public/assets/textures/reward.png') no-repeat local;
+}
 
 .hand {
   border: 5px solid black;
   border-radius: 5%;
-  width: 60%;
+  width: 70%;
   display: inline-block;
 }
 
 .deck {
   border: 5px solid black;
   border-radius: 5%;
-  width: 15%;
+  width: 10%;
   display: inline-block;
 }
 
 .discard {
   border: 5px solid black;
   border-radius: 5%;
-  width: 15%;
+  width: 10%;
   display: inline-block;
 }
