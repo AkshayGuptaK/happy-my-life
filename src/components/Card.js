@@ -1,7 +1,7 @@
 import React from 'react'
 
 class Card extends React.Component {
-  render () { // effort, counter
+  render () { // effort, counter, id
     return (
       <div className='card' texture={this.props.texture} onClick={this.props.onClick}>
         <p>{this.props.name}</p>

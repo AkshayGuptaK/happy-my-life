@@ -34,7 +34,7 @@ class App extends React.Component {
   }
   startGame = () => {
     this.setState({
-      player: { energy: 0, effort: 0, draft: 15, happiness: 1, turn: 1, step: 'begin' },
+      player: { energy: 0, effort: 0, draft: 15, happiness: 1, turn: 1, step: 'play' },
       draftStack: [],
       stapleArray: [10, 10, 5, 5],
       rewardArray: [5, 5, 5, 5],
@@ -53,11 +53,12 @@ class App extends React.Component {
       // shuffle
     }
   }
-  playCard = (e, index) => {
+  playCard = (e, id) => {
     if (this.state.player.step === 'play') {
       let hand = this.state.hand
       let play = this.state.play
-      play.push(hand.splice(index, 1))
+      let index = hand.findIndex(card => card.id === id)
+      play.push(hand.splice(index, 1)[0])
       this.setState({ 'hand': hand, 'play': play})
     }
   }
