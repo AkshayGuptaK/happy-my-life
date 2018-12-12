@@ -7,7 +7,7 @@ class Discard extends React.Component {
     return (
       <div className='discard'>
         { this.props.cards.length > 0
-          ? <Card {...this.props.cards[0]} />
+          ? <Card {...this.props.cards[-1]} />
           : null }
       </div>
     )

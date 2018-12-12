@@ -7,8 +7,9 @@
 
 .cardBack {
   background: url('../public/assets/back.png') no-repeat local;
+  background-size: contain;
   min-width: 100px;
-  min-height: 200px;
+  min-height: 150px;
 }
 
 .cardStack {
@@ -17,20 +18,28 @@
 
 [texture='banana'] {
   background: url('../public/assets/textures/banana.png') no-repeat local;
+  background-size: contain;
 }
 [texture='water'] {
   background: url('../public/assets/textures/waterbottle.png') no-repeat local;
+  background-size: contain;
 }
 [texture='raincheck'] {
   background: url('../public/assets/textures/raincheck.png') no-repeat local;
+  background-size: contain;
 }
 [texture='sad'] {
   background: url('../public/assets/textures/sadmemory.png') no-repeat local;
+  background-size: contain;
 }
 [texture='reward'] {
   background: url('../public/assets/textures/reward.png') no-repeat local;
+  background-size: contain;
 }
-
+[texture='action'] {
+  background: url('../public/assets/textures/action.png') no-repeat local;
+  background-size: contain;
+}
 .hand {
   border: 3px solid black;
   border-radius: 5%;

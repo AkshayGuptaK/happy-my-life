@@ -54,7 +54,7 @@ class App extends React.Component {
   }
   startGame = () => {
     this.setState({
-      player: { energy: 0, effort: 0, draft: 15, happiness: 1, turn: 1, step: 'play' },
+      player: { energy: 0, effort: 0, draft: 10, happiness: 1, turn: 1, step: 'play' },
       draftStack: shuffle(generateDraftDeck()),
       stapleArray: [10, 10, 5, 5],
       rewardArray: [5, 5, 5, 5],
@@ -135,12 +135,12 @@ class App extends React.Component {
         }
         <div>
           <DraftArray cards={this.state.draftStack} draft={this.draft} />
-          <StapleArray counts={this.state.stapleArray} draft={this.draftStaple}/>
+          <StapleArray counts={this.state.stapleArray} draft={this.draftStaple} />
           <RewardArray counts={this.state.rewardArray} buy={this.buyReward} />
         </div>
         <PlayZone cards={this.state.play} />
         <div>
-          <Counter {...this.state.player}/>
+          <Counter {...this.state.player} />
           <Hand cards={this.state.hand} play={this.playCard} />
           <Deck cards={this.state.deck} onClick={this.draw} />
           <Discard cards={this.state.discard} />
