@@ -32,22 +32,33 @@
 }
 
 .hand {
-  border: 5px solid black;
+  border: 3px solid black;
   border-radius: 5%;
   width: 70%;
   display: inline-block;
 }
 
 .deck {
-  border: 5px solid black;
+  border: 3px solid black;
   border-radius: 5%;
   width: 10%;
   display: inline-block;
 }
 
 .discard {
-  border: 5px solid black;
+  border: 3px solid black;
   border-radius: 5%;
   width: 10%;
+  display: inline-block;
+}
+
+.counter {
+  border: 3px solid black;
+  border-radius: 5%;
+  width: 5%;
+  display: inline-block;
+}
+
+.friendZone, .foodZone, .actionZone {
   display: inline-block;
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import { hot } from 'react-hot-loader'
 import shortid from 'shortid'
 
+import Counter from './Counter'
 import Hand from './Hand'
 import Deck from './Deck'
 import Discard from './Discard'
@@ -73,11 +74,16 @@ class App extends React.Component {
   }
   playCard = (e, id) => {
     if (this.state.player.step === 'play') {
+      let player = this.state.player
       let hand = this.state.hand
-      let play = this.state.play
       let index = hand.findIndex(card => card.id === id)
-      play.push(hand.splice(index, 1)[0])
-      this.setState({ 'hand': hand, 'play': play})
+      let card = hand[index]
+      if (card.energy <= player.energy & !/Memory/.test(card.type)) {
+        let play = this.state.play
+        player.energy -= card.energy
+        play.push(hand.splice(index, 1)[0])
+        this.setState({ 'player': player, 'hand': hand, 'play': play})  
+      }
     }
   }
   draft = (e, index) => {
@@ -134,6 +140,7 @@ class App extends React.Component {
         </div>
         <PlayZone cards={this.state.play} />
         <div>
+          <Counter {...this.state.player}/>
           <Hand cards={this.state.hand} play={this.playCard} />
           <Deck cards={this.state.deck} onClick={this.draw} />
           <Discard cards={this.state.discard} />
