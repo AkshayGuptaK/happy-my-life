@@ -6,5 +6,10 @@ module.exports = {
   'boxofsweets': { 'name': 'Box of Sweets', 'type': 'Reward-Consumable', 'text': 'Gain 4 Energy, Trash at end of turn', 'energy': 0, 'happiness': 1, 'texture': 'reward' },
   'blueberrypie': { 'name': 'Blueberry Pie', 'type': 'Reward-Consumable', 'text': 'Gain 2 Energy', 'energy': 0, 'happiness': 2, 'texture': 'reward' },
   'goodtime': { 'name': 'A Good Time', 'type': 'Reward-Memory', 'text': 'Discard at end of turn', 'energy': 0, 'happiness': 4, 'texture': 'reward' },
-  'happymemory': { 'name': 'Happy Memory', 'type': 'Reward-Memory', 'text': 'Discard at end of turn', 'energy': 0, 'happiness': 6, 'texture': 'reward' }
+  'happymemory': { 'name': 'Happy Memory', 'type': 'Reward-Memory', 'text': 'Discard at end of turn', 'energy': 0, 'happiness': 6, 'texture': 'reward' },
+  'brainstorm': { 'name': 'Brainstorm', 'type': 'Action', 'text': 'Draw two cards', 'energy': 1, 'happiness': 1, 'texture': 'action' },
+  'hardwork': { 'name': 'Its Hard Work', 'type': 'Action', 'text': 'Gain 2 Effort', 'energy': 5, 'happiness': 1, 'texture': 'action' },
+  'runerrand': { 'name': 'Run an Errand', 'type': 'Action', 'text': 'Gain 1 Effort', 'energy': 2, 'happiness': 1, 'texture': 'action' },
+  'study': { 'name': 'Study', 'type': 'Action', 'text': 'Draft a card', 'energy': 1, 'happiness': 1, 'texture': 'action' },
+  'train': { 'name': 'Train', 'type': 'Action', 'text': 'Draft two cards', 'energy': 3, 'happiness': 1, 'texture': 'action' }
 }

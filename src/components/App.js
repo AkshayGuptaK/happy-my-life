@@ -1,9 +1,7 @@
 import React from 'react'
 import { hot } from 'react-hot-loader'
 import shortid from 'shortid'
-// import { Route, Redirect, Switch } from 'react-router-dom'
 
-import '../App.css'
 import Hand from './Hand'
 import Deck from './Deck'
 import Discard from './Discard'
@@ -11,10 +9,31 @@ import DraftArray from './DraftArray'
 import RewardArray from './RewardArray'
 import StapleArray from './StapleArray'
 import PlayZone from './PlayZone'
+
+import '../App.css'
 import cardList from '../cardList'
+import draftDeck from '../draftDeck'
+
+function shuffle (arr) {
+  for (let i=arr.length-1; i>0; i--) {
+    let index = Math.floor(Math.random()*(i+1))
+    let current = arr[i]
+    let swap = arr[index]
+    arr[index] = current
+    arr[i] = swap
+  } return arr
+}
 
 function generateCard (card) {
   return Object.assign({'id': shortid.generate()}, cardList[card])
+}
+
+function generateCards (card, count) {
+  return Array(count).fill(card).map(generateCard)
+}
+
+function generateDraftDeck () {
+  return draftDeck.map(card => generateCards(card.name, card.count)).reduce((prev, curr) => prev.concat(curr))
 }
 
 class App extends React.Component {
@@ -35,7 +54,7 @@ class App extends React.Component {
   startGame = () => {
     this.setState({
       player: { energy: 0, effort: 0, draft: 15, happiness: 1, turn: 1, step: 'play' },
-      draftStack: [],
+      draftStack: shuffle(generateDraftDeck()),
       stapleArray: [10, 10, 5, 5],
       rewardArray: [5, 5, 5, 5],
       deck: [generateCard('banana')]
@@ -49,8 +68,7 @@ class App extends React.Component {
       this.setState({ 'deck': deck, 'hand': hand})
     }
     else if (this.state.discard.length > 0) {
-      this.setState({ 'deck': this.state.discard, 'discard': [] }, this.draw)
-      // shuffle
+      this.setState({ 'deck': shuffle(this.state.discard), 'discard': [] }, this.draw)
     }
   }
   playCard = (e, id) => {
@@ -60,6 +78,18 @@ class App extends React.Component {
       let index = hand.findIndex(card => card.id === id)
       play.push(hand.splice(index, 1)[0])
       this.setState({ 'hand': hand, 'play': play})
+    }
+  }
+  draft = (e, index) => {
+    if (this.state.player.draft > 0) {
+      let player = this.state.player
+      let draftStack = this.state.draftStack
+      let discard = this.state.discard
+      let card = draftStack.splice(index, 1)[0]
+      player.draft -=1
+      player.happiness += card.happiness
+      discard.push(card)
+      this.setState({ 'player': player, 'draftStack': draftStack, 'discard': discard })
     }
   }
   draftStaple = (e, index) => {
@@ -98,7 +128,7 @@ class App extends React.Component {
           : <button onClick={this.startGame}>Start Game</button>
         }
         <div>
-          <DraftArray cards={this.state.draftStack} />
+          <DraftArray cards={this.state.draftStack} draft={this.draft} />
           <StapleArray counts={this.state.stapleArray} draft={this.draftStaple}/>
           <RewardArray counts={this.state.rewardArray} buy={this.buyReward} />
         </div>
