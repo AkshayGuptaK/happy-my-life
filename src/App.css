@@ -1,8 +1,44 @@
+.board {
+  display: grid;
+  grid-template-columns: 25% 50% 25%;
+  grid-template-rows: 5% 50% 20% 25%;
+  place-content: stretch;
+  height: 95vh;
+}
+
+.board > button {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.board > .draftPot {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+.board > .play {
+  grid-column: 1 / 4;
+  grid-row: 3 / 4;
+}
+
+.board > .playerPanel {
+  grid-column: 1 / 4;
+  grid-row: 4 / 5;
+}
+
+.draftPot > div {
+  height: 30%;
+  margin-bottom: 5%;
+}
+
 .card, .cardBack {
-  border: 2px solid black;
-  border-radius: 5%;
-  max-width: 200px;
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 8vw;
+  height: 12vw;
   display: inline-block;
+  margin: 1vw;
+  overflow: hidden;
 }
 
 .cardBack {
@@ -10,6 +46,51 @@
   background-size: contain;
   min-width: 100px;
   min-height: 150px;
+}
+
+.card .name, .card .type {
+  margin: 3%;
+  border-radius: 5px;
+}
+
+.card .art {
+  margin: 3%;
+  height: 35%;
+  overflow: contain;
+}
+
+.card .icons {
+  display: inline-block;
+  min-width: 50px;
+  width: 25%;
+}
+
+.card .textbox {
+  display: inline-block;
+  width: 70%;
+  margin: 3%;
+  border-radius: 5px;
+}
+
+.card .name {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.card .type {
+  font-size: 0.7rem;
+}
+
+.card .text {
+  font-size: 0.7rem;
+}
+
+.icons > .energy {
+  background: url('../public/assets/ltng_bolt.svg') no-repeat local;
+}
+
+.icons > .happy {
+  background: url('../public/assets/pink_star.svg') no-repeat local;
 }
 
 .cardStack {
@@ -20,52 +101,68 @@
   background: url('../public/assets/textures/banana.png') no-repeat local;
   background-size: contain;
 }
+[texture='banana'] > p, [texture='banana'] .text, [texture='banana'] .art {
+  background-color: lightyellow;
+}
 [texture='water'] {
   background: url('../public/assets/textures/waterbottle.png') no-repeat local;
   background-size: contain;
+}
+[texture='water'] > p, [texture='water'] .text, [texture='water'] .art {
+  background-color: lightblue;
 }
 [texture='raincheck'] {
   background: url('../public/assets/textures/raincheck.png') no-repeat local;
   background-size: contain;
 }
+[texture='raincheck'] > p, [texture='raincheck'] .text, [texture='raincheck'] .art {
+  background-color: lightgrey;
+}
 [texture='sad'] {
   background: url('../public/assets/textures/sadmemory.png') no-repeat local;
   background-size: contain;
+}
+[texture='sad'] > p, [texture='sad'] .text, [texture='sad'] .art {
+  background-color: grey;
 }
 [texture='reward'] {
   background: url('../public/assets/textures/reward.png') no-repeat local;
   background-size: contain;
 }
+[texture='reward'] > p, [texture='reward'] .text, [texture='reward'] .art {
+  background-color: white;
+}
 [texture='action'] {
   background: url('../public/assets/textures/action.png') no-repeat local;
   background-size: contain;
 }
-.hand {
-  border: 3px solid black;
-  border-radius: 5%;
-  width: 70%;
+[texture='action'] > p, [texture='action'] .text, [texture='action'] .art {
+  background-color: rgb(250, 220, 160);
+}
+
+.hand, .deck, .discard, .counter {
   display: inline-block;
+  height: 100%;
+  border: 2px solid black;
+  border-radius: 5px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.hand {
+  width: 70%;
 }
 
 .deck {
-  border: 3px solid black;
-  border-radius: 5%;
   width: 10%;
-  display: inline-block;
 }
 
 .discard {
-  border: 3px solid black;
-  border-radius: 5%;
   width: 10%;
-  display: inline-block;
 }
 
 .counter {
-  border: 3px solid black;
-  border-radius: 5%;
-  width: 5%;
-  display: inline-block;
+  width: 7%;
 }
 
 .friendZone, .foodZone, .actionZone {
