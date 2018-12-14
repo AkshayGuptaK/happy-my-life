@@ -10,6 +10,7 @@ import DraftArray from './DraftArray'
 import RewardArray from './RewardArray'
 import StapleArray from './StapleArray'
 import PlayZone from './PlayZone'
+import TurnPanel from './TurnPanel'
 
 import '../App.css'
 import cardList from '../cardList'
@@ -42,7 +43,7 @@ class App extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      player: { energy: 0, effort: 0, draft: 0, happiness: 0, turn: 0, step: 'begin' },
+      player: { energy: 0, effort: 0, draft: 0, happiness: 0, turn: 0, step: 0 },
       draftStack: [],
       stapleArray: [],
       rewardArray: [],
@@ -55,7 +56,7 @@ class App extends React.Component {
   }
   startGame = () => {
     this.setState({
-      player: { energy: 0, effort: 0, draft: 0, happiness: 1, turn: 1, step: 'begin' },
+      player: { energy: 0, effort: 0, draft: 0, happiness: 1, turn: 1, step: 0 },
       draftStack: shuffle(generateDraftDeck()),
       stapleArray: [10, 10, 5, 5],
       rewardArray: [5, 5, 5, 5],
@@ -63,13 +64,10 @@ class App extends React.Component {
     }, this.nextStep)
   }
   nextStep = () => {
-    let steps = ['begin', 'draw', 'draft', 'play', 'end']
     let stepFuncs = [this.beginStep, this.drawStep, this.draftStep, this.playStep, this.endStep]
     let player = this.state.player
-    let currentStep = steps.indexOf(player.step)
-    let index = (currentStep + 1) % 5
-    player.step = steps[index]
-    this.setState({ 'player': player }, stepFuncs[index])
+    player.step = (player.step + 1) % 5
+    this.setState({ 'player': player }, stepFuncs[player.step])
   }
   beginStep = () => {
     let player = this.state.player
@@ -112,7 +110,7 @@ class App extends React.Component {
     }
   }
   playCard = (e, id) => {
-    if (this.state.player.step === 'play') {
+    if (this.state.player.step === 3) {
       let player = this.state.player
       let hand = this.state.hand
       let index = hand.findIndex(card => card.id === id)
@@ -172,10 +170,11 @@ class App extends React.Component {
           ? null
           : <button onClick={this.startGame}>Start Game</button>
         }
-        { /draft|play/.test(this.state.player.step)
+        { this.state.player.step === 2 | this.state.player.step === 3
           ? <button onClick={this.nextStep}>Continue</button>
           : null
         }
+        <TurnPanel turn={this.state.player.turn} step={this.state.player.step} />
         <div className='draftPot'>
           <DraftArray cards={this.state.draftStack} draft={this.draft} />
           <StapleArray counts={this.state.stapleArray} draft={this.draftStaple} />

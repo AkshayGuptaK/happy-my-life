@@ -11,6 +11,12 @@
   grid-row: 1 / 2;
 }
 
+.board > .turnPanel {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+  padding: 5px;
+}
+
 .board > .draftPot {
   grid-column: 2 / 3;
   grid-row: 2 / 3;
@@ -24,6 +30,21 @@
 .board > .playerPanel {
   grid-column: 1 / 4;
   grid-row: 4 / 5;
+}
+
+.turnPanel > .selected {
+  background-color: lightgreen;
+}
+
+.turnPanel > p {
+  font-size: 0.9rem;
+  margin: 1px;
+  text-align: center;
+}
+
+.turnPanel > .turn {
+  font-size: 1rem;
+  margin: 2px;
 }
 
 .draftPot > div {
