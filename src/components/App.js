@@ -85,7 +85,7 @@ class App extends React.Component {
     setTimeout(this.nextStep, 1000)
   }
   draftStep = () => {
-    let player = this.state.player
+    let player = Object.assign({}, this.state.player)
     player.draft ++
     this.setState({ 'player': player })
   }
@@ -112,7 +112,7 @@ class App extends React.Component {
       this.setState({ 'deck': shuffle(this.state.discard), 'discard': [] }, this.draw)
     }
   }
-  playCard = (e, id) => {
+  playCard = (id) => {
     if (this.state.step === 3) {
       let hand = this.state.hand
       let index = hand.findIndex(card => card.id === id)
@@ -126,7 +126,7 @@ class App extends React.Component {
       }
     }
   }
-  draft = (e, index) => {
+  draft = (index) => {
     if (this.state.player.draft > 0) {
       let player = this.state.player
       let draftStack = this.state.draftStack
@@ -138,7 +138,7 @@ class App extends React.Component {
       this.setState({ 'player': player, 'draftStack': draftStack, 'discard': discard })
     }
   }
-  draftStaple = (e, index) => {
+  draftStaple = (index) => {
     let staples = ['banana', 'waterbottle', 'raincheck', 'sadmemory']
     if (this.state.player.draft > 0) {
       let player = this.state.player
@@ -152,7 +152,7 @@ class App extends React.Component {
       this.setState({ 'player': player, 'stapleArray': stapleArray, 'discard': discard })
     }
   }
-  buyReward = (e, index) => {
+  buyReward = (index) => {
     let rewards = ['boxofsweets', 'blueberrypie', 'goodtime', 'happymemory']
     let card = generateCard(rewards[index])
     if (this.state.player.effort >= card.effort) {

@@ -1,9 +1,9 @@
 .board {
   display: grid;
   grid-template-columns: 25% 50% 25%;
-  grid-template-rows: 5% 50% 20% 25%;
+  grid-template-rows: 5% 55% 15% 25%;
   place-content: stretch;
-  height: 95vh;
+  height: 98vh;
 }
 
 .board > button {
@@ -82,36 +82,45 @@
 
 .card .icons {
   display: inline-block;
-  min-width: 50px;
-  width: 25%;
+  margin: 1px;
+  width: 25px;
 }
 
 .card .textbox {
   display: inline-block;
   width: 70%;
-  margin: 3%;
+  height: 95%;
   border-radius: 5px;
 }
 
 .card .name {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   text-align: center;
 }
 
 .card .type {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
 }
 
 .card .text {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
 }
 
 .icons > .energy {
   background: url('../public/assets/ltng_bolt.svg') no-repeat local;
+  margin: 0px;
+  height: 25px;
+  font-size: 0.7rem;
+  text-align: center;
+  color: white;
 }
 
 .icons > .happy {
   background: url('../public/assets/pink_star.svg') no-repeat local;
+  margin: 0px;
+  height: 25px;
+  font-size: 0.7rem;
+  text-align: center;
 }
 
 .cardStack {
@@ -184,6 +193,17 @@
 
 .counter {
   width: 7%;
+}
+
+.subcounter {
+  margin: 0 auto;
+  height: 100%;
+}
+
+.counter p {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  margin-left: 5px;
 }
 
 .friendZone, .foodZone, .actionZone {
