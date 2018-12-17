@@ -1,4 +1,4 @@
-module.exports = {
+exports.cardFuncs = {
   'banana': changePlayerStateFuncFactory(1, 'energy'),
   'waterbottle': noChange,
   'raincheck': changePlayerStateFuncFactory(1, 'draft'),
@@ -9,6 +9,28 @@ module.exports = {
   'runerrand': changePlayerStateFuncFactory(1, 'effort'),
   'study': changePlayerStateFuncFactory(1, 'draft'),
   'train': changePlayerStateFuncFactory(2, 'draft')
+}
+
+exports.draw = function draw (state) {
+  if (state.deck.length > 0) {
+    state.hand.push(state.deck.shift())
+    return state
+  }
+  if (state.discard.length > 0) {
+    state.deck = this.shuffle(state.discard)
+    state.discard = []
+    return draw(state)
+  } return state
+}
+
+exports.shuffle = function shuffle (arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    let index = Math.floor(Math.random() * (i + 1))
+    let current = arr[i]
+    let swap = arr[index]
+    arr[index] = current
+    arr[i] = swap
+  } return arr
 }
 
 function noChange (state) { // placeholder function for not implemented cards
