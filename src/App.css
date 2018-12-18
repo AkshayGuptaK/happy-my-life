@@ -1,3 +1,7 @@
+.lobby .selected {
+  background-color: lightblue
+}
+
 .board {
   display: grid;
   grid-template-columns: 25% 50% 25%;
