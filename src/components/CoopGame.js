@@ -2,13 +2,13 @@ import React from 'react'
 
 import cardList from '../cardList'
 import gameFunctions from '../gameFunctions'
+import generate from '../generateCards'
 import Board from './Board'
 
 class CoopGame extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      mode: 'coop',
       player: { energy: 0, effort: 0, draft: 0, happiness: 0 },
       totalScore: 0,
       turn: 0,
@@ -22,33 +22,55 @@ class CoopGame extends React.Component {
       play: [],
       trash: []
     }
+    this.mode = 'coop'
+    this.id = this.props.id
     this.socket = this.props.socket
+
+    this.socket.on('start', this.startGame)
+    this.socket.on('acceptDraft', this.onDraftSuccess)
+    this.socket.on('acceptDraftStaple', this.onDraftStapleSuccess)
+    this.socket.on('acceptBuyReward', this.onBuyRewardSuccess)
+    this.socket.on('Draft', this.onDraft)
+    this.socket.on('stapleDraft', this.onStapleDraft)
+    this.socket.on('rewardBuy', this.onRewardBuy)
+    this.socket.on('reject', () => alert('Sorry, that card is already taken'))
+    this.socket.on('nextStep', this.nextStep)
+    this.socket.on('nextTurn', this.nextTurn)
+    this.socket.on('end', score => alert(`Your final score is ${score}`)) // quit the game
   }
-  startGame = () => {
+  ready = () => {
+    this.socket.emit('ready', this.id)
+  }
+  continue = () => {
+    this.socket.emit('continue', this.id)
+  }
+  startGame = (game, score) => {
     this.setState({
       player: { energy: 0, effort: 0, draft: 0, happiness: 1 },
-      turn: 1,
-      draftStack: gameFunctions.shuffle(generateDraftDeck()),
-      stapleArray: [10, 10, 5, 5],
-      rewardArray: [5, 5, 5, 5],
-      deck: [generateCard('banana')]
-    }, this.nextStep)
+      totalScore: score,
+      turn: game.turn,
+      draftStack: game.draftStack,
+      stapleArray: game.stapleArray,
+      rewardArray: game.rewardArray,
+      deck: generate.startDeck()
+    }, this.continue)
   }
-  nextStep = () => {
+  nextStep = (newStep) => {
     let stepFuncs = [this.beginStep, this.drawStep, this.draftStep, this.playStep, this.endStep]
-    let step = (this.state.step + 1) % 5
+    let step = newStep
     this.setState({ 'step': step }, stepFuncs[step])
   }
+  finishedStep = () => {
+    setTimeout(this.continue, 1000)
+  }
   beginStep = () => {
-    let turn = this.state.turn + 1
-    this.setState({ 'turn': turn })
-    setTimeout(this.nextStep, 1000)
+    this.finishedStep()
   }
   drawStep = () => {
     for (let i=0; i<4; i++) {
       this.setState(gameFunctions.draw(this.state))
     }
-    setTimeout(this.nextStep, 1000)
+    this.finishedStep()
   }
   draftStep = () => {
     let player = Object.assign({}, this.state.player)
@@ -58,14 +80,13 @@ class CoopGame extends React.Component {
   playStep = () => {
   }
   endStep = () => {
-    if (this.state.turn === 5) {
-      alert(`Your final score is ${this.state.player.happiness}`)
-    } else {
-      let discard = this.state.discard
-      discard = discard.concat(this.state.play)
-      this.setState({ 'discard': discard, 'play': [] })
-      setTimeout(this.nextStep, 1000)
-    }
+    this.finishedStep()
+  }
+  nextTurn = (newTurn) => {
+    let turn = newTurn
+    let discard = this.state.discard
+    discard = discard.concat(this.state.play)
+    this.setState({ 'turn': turn, 'discard': discard, 'play': [] }, this.nextStep(0))
   }
   playCard = (id) => {
     if (this.state.step === 3) {
@@ -83,49 +104,59 @@ class CoopGame extends React.Component {
   }
   draft = (index) => {
     if (this.state.player.draft > 0) {
-      let player = this.state.player
-      let draftStack = this.state.draftStack
-      let discard = this.state.discard
-      let card = draftStack.splice(index, 1)[0]
-      player.draft -=1
-      player.happiness += card.happiness
-      discard.push(card)
-      this.setState({ 'player': player, 'draftStack': draftStack, 'discard': discard })
+      this.socket.emit('draft', this.id, this.state.draftStack[index])
     }
   }
   draftStaple = (index) => {
-    let staples = ['banana', 'waterbottle', 'raincheck', 'sadmemory']
     if (this.state.player.draft > 0) {
-      let player = this.state.player
-      let stapleArray = this.state.stapleArray
-      let discard = this.state.discard
-      let card = generateCard(staples[index])
-      player.draft -=1
-      player.happiness += card.happiness
-      stapleArray[index] -=1
-      discard.push(card)
-      this.setState({ 'player': player, 'stapleArray': stapleArray, 'discard': discard })
+      this.socket.emit('draftStaple', this.id, index)
     }
   }
   buyReward = (index) => {
-    let rewards = ['boxofsweets', 'blueberrypie', 'goodtime', 'happymemory']
-    let card = generateCard(rewards[index])
-    if (this.state.player.effort >= card.effort) {
-      let player = this.state.player
-      let rewardArray = this.state.rewardArray
-      let discard = this.state.discard
-      player.effort -= card.effort
-      player.happiness += card.happiness
-      rewardArray[index] -=1
-      discard.push(card)
-      this.setState({ 'player': player, 'rewardArray': rewardArray, 'discard': discard })
+    let effort = generate.lookupCardStackProperty('rewardArray', index, 'effort')
+    if (this.state.player.effort >= effort) {
+      this.socket.emit('buyReward', this.id, index)
     }
+  }
+  onAcquire = (card, myScore, totalScore) => {
+    let state = Object.assign({}, this.state)
+    state.discard.push(card)
+    state.player.happiness += myScore
+    state.totalScore = totalScore
+    return state
+  }
+  onDraftSuccess = (draftStack, card, myScore, totalScore) => {
+    let state = onAcquire(state, card, myScore, totalScore)
+    state.draftStack = draftStack
+    state.player.draft--
+    this.setState(state)
+  }
+  onDraftStapleSuccess = (stapleArray, card, myScore, totalScore) => {
+    let state = onAcquire(state, card, myScore, totalScore)
+    state.stapleArray = stapleArray
+    state.player.draft--
+    this.setState(state)
+  }
+  onRewardBuy = (rewardArray, card, myScore, totalScore) => {
+    let state = onAcquire(state, card, myScore, totalScore)
+    state.rewardArray = rewardArray
+    state.player.effort -= card.effort
+    this.setState(state)
+  }
+  onDraft = (draftStack, totalScore) => {
+    this.setState({ 'draftStack': draftStack, 'totalScore': totalScore })
+  }
+  onStapleDraft = (stapleArray, totalScore) => {
+    this.setState({ 'stapleArray': stapleArray, 'totalScore': totalScore })
+  }
+  onRewardBuy = (rewardArray, totalScore) => {
+    this.setState({ 'rewardArray': rewardArray, 'totalScore': totalScore })
   }
   render () {
     return (
       <Board {...this.state} 
-      start={this.startGame}
-      nextStep={this.nextStep}
+      start={this.ready}
+      nextStep={this.continue}
       draft={this.draft}
       draftStaple={this.draftStaple}
       buyReward={this.buyReward}

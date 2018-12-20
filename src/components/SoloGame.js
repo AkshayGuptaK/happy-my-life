@@ -1,29 +1,14 @@
 import React from 'react'
-import shortid from 'shortid'
 
 import cardList from '../cardList'
 import gameFunctions from '../gameFunctions'
-import artPaths from '../artPaths'
-import draftDeck from '../draftDeck'
+import generate from '../generateCards'
 import Board from './Board'
-
-function generateCard (card) {
-  return Object.assign({'id': shortid.generate(), 'art': artPaths[card]}, cardList[card])
-}
-
-function generateCards (card, count) {
-  return Array(count).fill(card).map(generateCard)
-}
-
-function generateDraftDeck () {
-  return draftDeck.map(card => generateCards(card.name, card.count)).reduce((prev, curr) => prev.concat(curr))
-}
 
 class SoloGame extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      mode: 'solo',
       player: { energy: 0, effort: 0, draft: 0, happiness: 0 },
       turn: 0,
       step: 0,
@@ -36,15 +21,16 @@ class SoloGame extends React.Component {
       play: [],
       trash: []
     }
+    this.mode = 'solo'
   }
   startGame = () => {
     this.setState({
       player: { energy: 0, effort: 0, draft: 0, happiness: 1 },
       turn: 1,
-      draftStack: gameFunctions.shuffle(generateDraftDeck()),
-      stapleArray: [10, 10, 5, 5],
-      rewardArray: [5, 5, 5, 5],
-      deck: [generateCard('banana')]
+      draftStack: gameFunctions.shuffle(generate.draftDeck()),
+      stapleArray: generate.stapleArray(1),
+      rewardArray: generate.rewardArray(1),
+      deck: [generate.startDeck()]
     }, this.nextStep)
   }
   nextStep = () => {
@@ -107,12 +93,11 @@ class SoloGame extends React.Component {
     }
   }
   draftStaple = (index) => {
-    let staples = ['banana', 'waterbottle', 'raincheck', 'sadmemory']
     if (this.state.player.draft > 0) {
       let player = this.state.player
       let stapleArray = this.state.stapleArray
       let discard = this.state.discard
-      let card = generateCard(staples[index])
+      let card = generate.staple(index)
       player.draft -=1
       player.happiness += card.happiness
       stapleArray[index] -=1
@@ -121,8 +106,7 @@ class SoloGame extends React.Component {
     }
   }
   buyReward = (index) => {
-    let rewards = ['boxofsweets', 'blueberrypie', 'goodtime', 'happymemory']
-    let card = generateCard(rewards[index])
+    let card = generate.reward(index)
     if (this.state.player.effort >= card.effort) {
       let player = this.state.player
       let rewardArray = this.state.rewardArray

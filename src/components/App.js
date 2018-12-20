@@ -5,11 +5,14 @@ import io from 'socket.io-client'
 import '../App.css'
 import Lobby from './Lobby'
 import SoloGame from './SoloGame'
+import CoopGame from './CoopGame';
 
 class App extends React.Component {
   constructor (props) {
     super(props)
     this.state = { games: [], in_game: null, game_type: null }
+  }
+  componentDidMount () {
     this.socket = io.connect('http://localhost:8000')
     this.socket.on('connect', () => console.log('connected'))
     this.socket.on('gamesList', gameIds => this.setState({ games: gameIds }))
@@ -27,7 +30,7 @@ class App extends React.Component {
     return (
       <div>
         {this.state.in_game
-        ? <SoloGame socket={this.socket}/>
+        ? <CoopGame socket={this.socket} id={this.state.in_game}/>
         : <Lobby create={() => this.socket.emit('newGame')} join={(selected) => this.socket.emit('joinGame', selected)} games={this.state.games}/>
         }
       </div>
