@@ -92,7 +92,7 @@
 .card .icons {
   display: inline-block;
   margin: 1px;
-  width: 25px;
+  width: 27px;
 }
 
 .card .textbox {
@@ -118,8 +118,8 @@
 .icons > .energy {
   background: url('../public/assets/ltng_bolt.svg') no-repeat local;
   margin: 0px;
-  height: 25px;
-  font-size: 0.7rem;
+  height: 26px;
+  font-size: 0.8rem;
   text-align: center;
   color: white;
 }
@@ -127,8 +127,16 @@
 .icons > .happy {
   background: url('../public/assets/pink_star.svg') no-repeat local;
   margin: 0px;
-  height: 25px;
-  font-size: 0.7rem;
+  height: 26px;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.icons > .effort {
+  background: url('../public/assets/hammer.svg') no-repeat local;
+  margin: 0px;
+  height: 26px;
+  font-size: 0.8rem;
   text-align: center;
 }
 

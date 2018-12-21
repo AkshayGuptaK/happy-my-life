@@ -10,10 +10,8 @@ class Card extends React.Component {
         </div>
         <p className='type'>{this.props.type}</p>
         <div className='icons'>
-          {this.props.energy > 0
-            ? <p className='energy'>{this.props.energy}</p>
-            : null
-          }
+          {this.props.energy > 0 && <p className='energy'>{this.props.energy}</p>}
+          {this.props.effort > 0 && <p className='effort'>{this.props.effort}</p>}
           <p className='happy'>{this.props.happiness}</p>
         </div>
         <div className='textbox'>
