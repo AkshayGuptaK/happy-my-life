@@ -141,7 +141,7 @@ class CoopGame extends React.Component {
     state.player.draft--
     this.setState(state)
   }
-  onRewardBuy = (rewardArray, card, myScore, totalScore) => {
+  onBuyRewardSuccess = (rewardArray, card, myScore, totalScore) => {
     let state = this.onAcquire(card, myScore, totalScore)
     state.rewardArray = rewardArray
     state.player.effort -= card.effort

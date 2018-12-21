@@ -6,9 +6,9 @@ const generate = require('./generateCards')
 const gameFunctions = require('./gameFunctions')
 
 const port = 8000
-const maxTurns = 3
+const maxTurns = 7
 
-var Gid = 0
+var gid = 0
 var games = []
 
 class Game {
@@ -40,11 +40,11 @@ function getPlayerIndex (game, client) {
 
 function createGame (client) {
   console.log('creating game') // debug
-  Gid++
-  client.join(`Room ${Gid}`)
-  games.push(new Game(Gid, client))
-  client.emit('joinGame', Gid)
-  io.emit('newGame', Gid)
+  gid++
+  client.join(`Room ${gid}`)
+  games.push(new Game(gid, client))
+  client.emit('joinGame', gid)
+  io.emit('newGame', gid)
 }
 
 function joinGame (client, selected) {
