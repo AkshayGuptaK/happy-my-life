@@ -14,14 +14,16 @@ class Board extends React.Component {
   render () {
     return (
       <div className='board'>
-        { this.props.turn > 0
-          ? null
+        <p className='score'>Total Happiness: {this.props.totalScore}</p>
+        { (this.props.turn === 0) && (this.props.waiting
+          ? <p>Waiting for other players...</p>
           : <button onClick={this.props.start}>Start Game</button>
-        }
-        { this.props.step === 2 | this.props.step === 3
-          ? <button onClick={this.props.nextStep}>Continue</button>
-          : null
-        }
+        )}
+        { (this.props.step === 2 | this.props.step === 3) === 1 && (this.props.waiting
+          ? <p>Waiting for other players...</p>
+          : <button onClick={this.props.nextStep}>Continue</button>
+        )}
+        { this.props.ended && <button onClick={this.props.quit}>Return to Lobby</button>}
         <TurnPanel turn={this.props.turn} step={this.props.step} />
         <div className='draftPot'>
           <DraftArray cards={this.props.draftStack} draft={this.props.draft} />
