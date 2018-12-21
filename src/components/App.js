@@ -5,33 +5,34 @@ import io from 'socket.io-client'
 import '../App.css'
 import Lobby from './Lobby'
 import SoloGame from './SoloGame'
-import CoopGame from './CoopGame';
+import CoopGame from './CoopGame'
 
 class App extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { games: [], in_game: null, game_type: null }
+    this.state = { games: [], inGame: null, gameType: null }
   }
   componentDidMount () {
     this.socket = io.connect('http://localhost:8000')
     this.socket.on('connect', () => console.log('connected'))
     this.socket.on('gamesList', gameIds => this.setState({ games: gameIds }))
-    this.socket.on('gameCreated', this.createGame)
-    this.socket.on('gameJoined', this.joinGame)
-    this.socket.on('broadcast', msg => alert(msg))
+    this.socket.on('joinGame', id => this.setState({ 'inGame': id }))
+    this.socket.on('newGame', id => this.setState({ 'games': this.state.games.concat([id]) }))
+    this.socket.on('rejectJoin', () => alert('Sorry, you cannot join this game'))
   }
-  createGame = (id) => {
-    this.setState({ 'games': this.state.games.concat([id]), 'in_game': id })
+  requestJoin = (selected) => {
+    selected ? this.socket.emit('joinGame', selected) : alert('Please select a game')
   }
-  joinGame = (id) => {
-    this.setState({ 'in_game': id })
+  returnLobby = () => {
+    this.socket.emit('leave', this.state.inGame)
+    this.setState({ 'inGame': null, 'gameType': null })
   }
   render () {
     return (
       <div>
-        {this.state.in_game
-        ? <CoopGame socket={this.socket} id={this.state.in_game}/>
-        : <Lobby create={() => this.socket.emit('newGame')} join={(selected) => this.socket.emit('joinGame', selected)} games={this.state.games}/>
+        {this.state.inGame
+          ? <CoopGame socket={this.socket} id={this.state.inGame} quit={this.returnLobby}/>
+          : <Lobby create={() => this.socket.emit('newGame')} join={this.requestJoin} games={this.state.games}/>
         }
       </div>
     )

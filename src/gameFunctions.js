@@ -1,7 +1,7 @@
 exports.cardFuncs = {
   'banana': changePlayerStateFuncFactory(1, 'energy'),
   'waterbottle': noChange,
-  'raincheck': changePlayerStateFuncFactory(1, 'draft'),
+  'raincheck': changePlayerStateFuncFactory(1, 'draft'), // add draw
   'boxofsweets': changePlayerStateFuncFactory(4, 'energy'),
   'blueberrypie': changePlayerStateFuncFactory(2, 'energy'),
   'brainstorm': noChange,

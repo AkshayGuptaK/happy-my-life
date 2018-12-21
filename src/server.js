@@ -3,9 +3,10 @@ const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 
 const generate = require('./generateCards')
+const gameFunctions = require('./gameFunctions')
 
 const port = 8000
-const maxTurns = 10
+const maxTurns = 3
 
 var Gid = 0
 var games = []
@@ -42,19 +43,31 @@ function createGame (client) {
   Gid++
   client.join(`Room ${Gid}`)
   games.push(new Game(Gid, client))
-  io.emit('gameCreated', Gid) // update game lists in lobbies
+  client.emit('joinGame', Gid)
+  io.emit('newGame', Gid)
 }
 
 function joinGame (client, selected) {
   console.log('joining game') // debug
   let id = getIDFromRoomName(selected)
   let game = getGameFromID(id)
-  if (game) {
-    client.join(selected) // should check if a player is already in a game
+  if (game.state.turn === 0) {
+    client.join(selected)
     game.players.push(client)
     game.state.status.push(false)
     game.state.happiness.push(0)
-    client.emit('gameJoined', id)
+    client.emit('joinGame', id)
+  } else {
+    client.emit('rejectJoin')
+  }
+}
+
+function leaveGame (id, client) {
+  let game = getGameFromID(id)
+  game.players.splice(getPlayerIndex(game, client), 1)
+  if (game.players.length === 0) {
+    games.splice(games.findIndex(session => session === game), 1)
+    io.emit('gamesList', games.map(game => game.id))
   }
 }
 
@@ -72,9 +85,10 @@ function playerReady (id, client, completeFunc) {
 function startGame (game) {
   console.log('starting game') // debug
   game.state.turn = 1
-  game.state.draftStack = generate.draftDeck()
+  game.state.draftStack = gameFunctions.shuffle(generate.draftDeck())
   game.state.stapleArray = generate.stapleArray(game.players.length)
   game.state.rewardArray = generate.rewardArray(game.players.length)
+  game.state.happiness.fill(1)
   io.to(`Room ${game.id}`).emit('start', game.state, game.totalScore())
 }
 
@@ -97,12 +111,13 @@ function nextStep (game) {
 function draft (id, client, draftCard) {
   console.log('drafting card') // debug
   let game = getGameFromID(id)
-  let index = game.draftStack.indexOf(draftCard)
+  let index = game.state.draftStack.findIndex(card => card.id === draftCard.id)
   if (index >= 0 & index < 4) {
-    let card = game.draftStack.splice(index, 1)
-    let happiness = game.state.happiness[getPlayerIndex(game, client)] += card.happiness
-    client.emit('acceptDraft', game.draftStack, card, happiness, game.totalScore())
-    client.to(`Room ${id}`).emit('Draft', game.draftStack, game.totalScore())
+    let card = game.state.draftStack.splice(index, 1)[0]
+    game.state.happiness[getPlayerIndex(game, client)] += card.happiness
+    let happiness = game.state.happiness[getPlayerIndex(game, client)]
+    client.emit('acceptDraft', game.state.draftStack, card, happiness, game.totalScore())
+    client.to(`Room ${id}`).emit('Draft', game.state.draftStack, game.totalScore())
   } else client.emit('reject')
 }
 
@@ -114,7 +129,8 @@ function draftStaple (id, client, index) {
   if (stack[index] > 0) {
     stack[index]--
     let card = generate.staple(index)
-    let happiness = game.state.happiness[getPlayerIndex(game, client)] += card.happiness
+    game.state.happiness[getPlayerIndex(game, client)] += card.happiness
+    let happiness = game.state.happiness[getPlayerIndex(game, client)]
     client.emit('acceptDraftStaple', stack, card, happiness, game.totalScore())
     client.to(`Room ${id}`).emit('stapleDraft', stack, game.totalScore())
   } else client.emit('reject')
@@ -128,7 +144,8 @@ function buyReward (id, client, index) {
   if (stack[index] > 0) {
     stack[index]--
     let card = generate.reward(index)
-    let happiness = game.state.happiness[getPlayerIndex(game, client)] += card.happiness
+    game.state.happiness[getPlayerIndex(game, client)] += card.happiness
+    let happiness = game.state.happiness[getPlayerIndex(game, client)]
     client.emit('acceptBuyReward', stack, card, happiness, game.totalScore())
     client.to(`Room ${id}`).emit('rewardBuy', stack, game.totalScore())
   } else client.emit('reject')
@@ -136,12 +153,12 @@ function buyReward (id, client, index) {
 
 io.on('connection', (client) => {
   console.log('Connection made')
-  client.emit('gamesList', games)
-  client.on('blash', () => console.log('errr'))
+  client.emit('gamesList', games.map(game => game.id))
   client.on('newGame', () => createGame(client))
   client.on('joinGame', selected => joinGame(client, selected))
-  client.on('ready', (id) => playerReady(id, client, startGame))
-  client.on('continue', (id) => playerReady(id, client, nextStep))
+  client.on('leave', id => leaveGame(id, client))
+  client.on('ready', id => playerReady(id, client, startGame))
+  client.on('continue', id => playerReady(id, client, nextStep))
   client.on('draft', (id, card) => draft(id, client, card))
   client.on('draftStaple', (id, index) => draftStaple(id, client, index))
   client.on('buyReward', (id, index) => buyReward(id, client, index))

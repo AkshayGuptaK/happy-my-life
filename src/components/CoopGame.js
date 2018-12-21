@@ -20,7 +20,9 @@ class CoopGame extends React.Component {
       deck: [],
       discard: [],
       play: [],
-      trash: []
+      trash: [],
+      waiting: false,
+      ended: false
     }
     this.mode = 'coop'
     this.id = this.props.id
@@ -36,12 +38,14 @@ class CoopGame extends React.Component {
     this.socket.on('reject', () => alert('Sorry, that card is already taken'))
     this.socket.on('nextStep', this.nextStep)
     this.socket.on('nextTurn', this.nextTurn)
-    this.socket.on('end', score => alert(`Your final score is ${score}`)) // quit the game
+    this.socket.on('end', this.endGame)
   }
   ready = () => {
+    this.setState({ 'waiting': true })
     this.socket.emit('ready', this.id)
   }
   continue = () => {
+    this.setState({ 'waiting': true })
     this.socket.emit('continue', this.id)
   }
   startGame = (game, score) => {
@@ -52,13 +56,13 @@ class CoopGame extends React.Component {
       draftStack: game.draftStack,
       stapleArray: game.stapleArray,
       rewardArray: game.rewardArray,
-      deck: generate.startDeck()
+      deck: [generate.startDeck()],
     }, this.continue)
   }
   nextStep = (newStep) => {
     let stepFuncs = [this.beginStep, this.drawStep, this.draftStep, this.playStep, this.endStep]
     let step = newStep
-    this.setState({ 'step': step }, stepFuncs[step])
+    this.setState({ 'step': step, 'waiting': false }, stepFuncs[step])
   }
   finishedStep = () => {
     setTimeout(this.continue, 1000)
@@ -121,24 +125,24 @@ class CoopGame extends React.Component {
   onAcquire = (card, myScore, totalScore) => {
     let state = Object.assign({}, this.state)
     state.discard.push(card)
-    state.player.happiness += myScore
+    state.player.happiness = myScore
     state.totalScore = totalScore
     return state
   }
   onDraftSuccess = (draftStack, card, myScore, totalScore) => {
-    let state = onAcquire(state, card, myScore, totalScore)
+    let state = this.onAcquire(card, myScore, totalScore)
     state.draftStack = draftStack
     state.player.draft--
     this.setState(state)
   }
   onDraftStapleSuccess = (stapleArray, card, myScore, totalScore) => {
-    let state = onAcquire(state, card, myScore, totalScore)
+    let state = this.onAcquire(card, myScore, totalScore)
     state.stapleArray = stapleArray
     state.player.draft--
     this.setState(state)
   }
   onRewardBuy = (rewardArray, card, myScore, totalScore) => {
-    let state = onAcquire(state, card, myScore, totalScore)
+    let state = this.onAcquire(card, myScore, totalScore)
     state.rewardArray = rewardArray
     state.player.effort -= card.effort
     this.setState(state)
@@ -152,15 +156,20 @@ class CoopGame extends React.Component {
   onRewardBuy = (rewardArray, totalScore) => {
     this.setState({ 'rewardArray': rewardArray, 'totalScore': totalScore })
   }
+  endGame = (score) => {
+    alert(`Your final score is ${score}`)
+    this.setState({ 'ended': true })
+  }
   render () {
     return (
-      <Board {...this.state} 
+      <Board {...this.state}
       start={this.ready}
       nextStep={this.continue}
       draft={this.draft}
       draftStaple={this.draftStaple}
       buyReward={this.buyReward}
-      playCard={this.playCard} />
+      playCard={this.playCard} 
+      quit={this.props.quit} />
     )
   }
 }
