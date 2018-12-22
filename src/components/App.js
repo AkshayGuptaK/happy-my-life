@@ -8,12 +8,12 @@ import SoloGame from './SoloGame'
 import CoopGame from './CoopGame'
 
 class App extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor () {
+    super()
     this.state = { games: [], inGame: null, gameType: null }
   }
   componentDidMount () {
-    this.socket = io.connect('http://192.168.0.105:8000')
+    this.socket = io.connect('http://localhost:8000')
     this.socket.on('connect', () => console.log('connected'))
     this.socket.on('gamesList', gameIds => this.setState({ games: gameIds }))
     this.socket.on('joinGame', id => this.setState({ 'inGame': id }))

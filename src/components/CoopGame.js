@@ -84,7 +84,11 @@ class CoopGame extends React.Component {
   playStep = () => {
   }
   endStep = () => {
-    this.finishedStep()
+    let player = Object.assign({}, this.state.player)
+    player.energy = 0
+    player.effort = 0
+    player.draft = 0
+    this.setState({ 'player': player }, this.finishedStep)
   }
   nextTurn = (newTurn) => {
     let turn = newTurn

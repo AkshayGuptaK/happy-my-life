@@ -37,7 +37,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'public/'),
     port: 3000,
-    host: '192.168.0.105',
+    host: 'localhost',
     hotOnly: true
   },
   plugins: [
