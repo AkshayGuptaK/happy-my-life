@@ -4,6 +4,7 @@ import io from 'socket.io-client'
 
 import '../App.css'
 import Lobby from './Lobby'
+import GameLogic from './Game'
 import SoloGame from './SoloGame'
 import CoopGame from './CoopGame'
 
@@ -16,12 +17,16 @@ class App extends React.Component {
     this.socket = io.connect('http://localhost:8000')
     this.socket.on('connect', () => console.log('connected'))
     this.socket.on('gamesList', gameIds => this.setState({ games: gameIds }))
-    this.socket.on('joinGame', id => this.setState({ 'inGame': id }))
+    this.socket.on('joinGame', this.onJoin)
     this.socket.on('newGame', id => this.setState({ 'games': this.state.games.concat([id]) }))
     this.socket.on('rejectJoin', () => alert('Sorry, you cannot join this game'))
   }
   requestJoin = (selected) => {
     selected ? this.socket.emit('joinGame', selected) : alert('Please select a game')
+  }
+  onJoin = (id) => {
+    this.Cooperative = GameLogic(CoopGame, { socket: this.socket, id: id, quit: this.returnLobby })
+    this.setState({ 'inGame': id })
   }
   returnLobby = () => {
     this.socket.emit('leave', this.state.inGame)
@@ -31,7 +36,7 @@ class App extends React.Component {
     return (
       <div>
         {this.state.inGame
-          ? <CoopGame socket={this.socket} id={this.state.inGame} quit={this.returnLobby}/>
+          ? <this.Cooperative />
           : <Lobby create={() => this.socket.emit('newGame')} join={this.requestJoin} games={this.state.games}/>
         }
       </div>

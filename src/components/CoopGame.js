@@ -1,179 +1,85 @@
 import React from 'react'
 
-import cardList from '../cardList'
-import gameFunctions from '../gameFunctions'
-import generate from '../generateCards'
 import Board from './Board'
+import generate from '../generateCards'
 
 class CoopGame extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      player: { energy: 0, effort: 0, draft: 0, happiness: 0 },
       totalScore: 0,
-      turn: 0,
-      step: 0,
-      draftStack: [],
-      stapleArray: [],
-      rewardArray: [],
-      hand: [],
-      deck: [],
-      discard: [],
-      play: [],
-      trash: [],
-      waiting: false,
-      ended: false
+      waiting: false
     }
-    this.mode = 'coop'
-    this.id = this.props.id
-    this.socket = this.props.socket
-
-    this.socket.on('start', this.startGame)
-    this.socket.on('acceptDraft', this.onDraftSuccess)
-    this.socket.on('acceptDraftStaple', this.onDraftStapleSuccess)
-    this.socket.on('acceptBuyReward', this.onBuyRewardSuccess)
-    this.socket.on('Draft', this.onDraft)
-    this.socket.on('stapleDraft', this.onStapleDraft)
-    this.socket.on('rewardBuy', this.onRewardBuy)
-    this.socket.on('reject', () => alert('Sorry, that card is already taken'))
-    this.socket.on('nextStep', this.nextStep)
-    this.socket.on('nextTurn', this.nextTurn)
-    this.socket.on('end', this.endGame)
+  }
+  componentDidMount () {
+    this.props.socket.on('start', this.startGame)
+    this.props.socket.on('acceptDraft', this.onDraftSuccess)
+    this.props.socket.on('acceptDraftStaple', this.onDraftStapleSuccess)
+    this.props.socket.on('acceptBuyReward', this.onBuyRewardSuccess)
+    this.props.socket.on('Draft', (stack, score) => this.onOtherPlayerDraft(score, 'draftStack', stack))
+    this.props.socket.on('stapleDraft', (stack, score) => this.onOtherPlayerDraft(score, 'stapleArray', stack))
+    this.props.socket.on('rewardBuy', (stack, score) => this.onOtherPlayerDraft(score, 'rewardArray', stack))
+    this.props.socket.on('reject', () => alert('Sorry, that card is already taken'))
+    this.props.socket.on('nextStep', this.nextStep)
+    this.props.socket.on('nextTurn', this.nextTurn)
+    this.props.socket.on('end', this.props.end)
   }
   ready = () => {
     this.setState({ 'waiting': true })
-    this.socket.emit('ready', this.id)
+    this.props.socket.emit('ready', this.props.id)
   }
   continue = () => {
     this.setState({ 'waiting': true })
-    this.socket.emit('continue', this.id)
+    this.props.socket.emit('continue', this.props.id)
   }
   startGame = (game, score) => {
-    this.setState({
-      player: { energy: 0, effort: 0, draft: 0, happiness: 1 },
-      totalScore: score,
-      turn: game.turn,
-      draftStack: game.draftStack,
-      stapleArray: game.stapleArray,
-      rewardArray: game.rewardArray,
-      deck: [generate.startDeck()],
-    }, this.continue)
+    this.setState({ 'totalScore': score })
+    this.props.start(game.draftStack, game.stapleArray, game.rewardArray, this.continue)
   }
   nextStep = (newStep) => {
-    let stepFuncs = [this.beginStep, this.drawStep, this.draftStep, this.playStep, this.endStep]
-    let step = newStep
-    this.setState({ 'step': step, 'waiting': false }, stepFuncs[step])
-  }
-  finishedStep = () => {
-    setTimeout(this.continue, 1000)
-  }
-  beginStep = () => {
-    this.finishedStep()
-  }
-  drawStep = () => {
-    for (let i=0; i<4; i++) {
-      this.setState(gameFunctions.draw(this.state))
-    }
-    this.finishedStep()
-  }
-  draftStep = () => {
-    let player = Object.assign({}, this.state.player)
-    player.draft ++
-    this.setState({ 'player': player })
-  }
-  playStep = () => {
-  }
-  endStep = () => {
-    let player = Object.assign({}, this.state.player)
-    player.energy = 0
-    player.effort = 0
-    player.draft = 0
-    this.setState({ 'player': player }, this.finishedStep)
+    this.setState({ 'waiting': false })
+    this.props.next(newStep, this.continue)
   }
   nextTurn = (newTurn) => {
-    let turn = newTurn
-    let discard = this.state.discard
-    discard = discard.concat(this.state.play)
-    this.setState({ 'turn': turn, 'discard': discard, 'play': [] }, this.nextStep(0))
-  }
-  playCard = (id) => {
-    if (this.state.step === 3) {
-      let hand = this.state.hand
-      let index = hand.findIndex(card => card.id === id)
-      let card = hand[index]
-      if (card.energy <= this.state.player.energy & !card.type.includes('Memory')) {
-        let cardLookup = Object.keys(cardList).find(key => cardList[key].name === card.name)
-        let state = gameFunctions.cardFuncs[cardLookup](Object.assign({}, this.state))
-        state.player.energy -= card.energy
-        state.play.push(state.hand.splice(index, 1)[0])
-        this.setState(state)
-      }
-    }
-  }
+    this.props.clean(newTurn, this.continue)
+  }  
   draft = (index) => {
-    if (this.state.player.draft > 0) {
-      this.socket.emit('draft', this.id, this.state.draftStack[index])
+    if (this.props.player.draft > 0) {
+      this.props.socket.emit('draft', this.props.id, this.props.draftStack[index])
     }
   }
   draftStaple = (index) => {
-    if (this.state.player.draft > 0) {
-      this.socket.emit('draftStaple', this.id, index)
+    if (this.props.player.draft > 0) {
+      this.props.socket.emit('draftStaple', this.props.id, index)
     }
   }
   buyReward = (index) => {
     let effort = generate.lookupCardStackProperty('rewardArray', index, 'effort')
-    if (this.state.player.effort >= effort) {
-      this.socket.emit('buyReward', this.id, index)
+    if (this.props.player.effort >= effort) {
+      this.props.socket.emit('buyReward', this.props.id, index)
     }
   }
-  onAcquire = (card, myScore, totalScore) => {
-    let state = Object.assign({}, this.state)
-    state.discard.push(card)
-    state.player.happiness = myScore
-    state.totalScore = totalScore
-    return state
-  }
   onDraftSuccess = (draftStack, card, myScore, totalScore) => {
-    let state = this.onAcquire(card, myScore, totalScore)
-    state.draftStack = draftStack
-    state.player.draft--
-    this.setState(state)
+  this.setState({ 'totalScore': totalScore }, ()=>this.props.draft(card, myScore, draftStack))
   }
   onDraftStapleSuccess = (stapleArray, card, myScore, totalScore) => {
-    let state = this.onAcquire(card, myScore, totalScore)
-    state.stapleArray = stapleArray
-    state.player.draft--
-    this.setState(state)
+    this.setState({ 'totalScore': totalScore }, ()=>this.props.draftStaple(card, myScore, stapleArray))
   }
   onBuyRewardSuccess = (rewardArray, card, myScore, totalScore) => {
-    let state = this.onAcquire(card, myScore, totalScore)
-    state.rewardArray = rewardArray
-    state.player.effort -= card.effort
-    this.setState(state)
+    this.setState({ 'totalScore': totalScore }, ()=>this.props.buy(card, myScore, rewardArray))
   }
-  onDraft = (draftStack, totalScore) => {
-    this.setState({ 'draftStack': draftStack, 'totalScore': totalScore })
-  }
-  onStapleDraft = (stapleArray, totalScore) => {
-    this.setState({ 'stapleArray': stapleArray, 'totalScore': totalScore })
-  }
-  onRewardBuy = (rewardArray, totalScore) => {
-    this.setState({ 'rewardArray': rewardArray, 'totalScore': totalScore })
-  }
-  endGame = (score) => {
-    alert(`Your final score is ${score}`)
-    this.setState({ 'ended': true })
+  onOtherPlayerDraft = (score, stackName, stack) => {
+    this.setState({ 'totalScore': score }, () => this.props.set(stackName, stack))
   }
   render () {
     return (
-      <Board {...this.state}
+      <Board {...this.state} {...this.props}
       start={this.ready}
       nextStep={this.continue}
       draft={this.draft}
       draftStaple={this.draftStaple}
       buyReward={this.buyReward}
-      playCard={this.playCard} 
-      quit={this.props.quit} />
+      playCard={this.props.playCard} />
     )
   }
 }
